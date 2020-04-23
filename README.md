@@ -5,15 +5,23 @@ Limited predictability of clade frequencies of seasonal influenza viruses
 Pierre Barrat-Charlaix, John Huddleston, Trevor Bedford & Richard Neher
 ``  
 
-## Required libraries  
-This code is entirely written in the Julia language. It uses several external modules, which can be installed by entering the following line of code in the Julia REPL (after typing `]`):   
-`add BioSequences CurveFit Dates Dierckx IJulia KernelDensity LaTeXStrings Measures Plots PyPlot Random Statistics StatsBase StatsPlots`  
-and  
-`add https://github.com/PierreBarrat/FastaIO.jl`    
+## Installing
+You need Julia version 1.1 or higher to run this code, and IJulia to run the notebooks.  
+If you cloned this repository to your computer, navigate to it, start a julia REPL session and type  
+`]activate .`  
+followed by 
+`]build IJulia`  
+
+Alternatively, you can type  
+`]add https://github.com/PierreBarrat/FluPredictibility`  
+in a julia REPL session to clone and install dependencies at the same time. Rune the IJulia relative commands after.  
+
+You should now be able to start jupyter notebooks with   
+`using IJulia; IJulia.notebook()`  
+or by launching jupyter directly from your shell. 
     
 
 ## Organisation  
-- Folders `BioTools`, `EarthMoversDistance` and `TreeTools` contain custom Julia modules that are used to process the data and generate plots. They need to be added to variable `LOAD_PATH`, for instance by running the command `push!(LOAD_PATH, "path/to/FluPredictibility")`. They will then be usable by calling `using BioTools`.    
 - Folder `data` contains trees and lists of positions in HA and NA proteins necessary for the analysis. It does *not* contain the sequence alignments used in the paper. Accession numbers of strain used are available as a supplementary file with the publication.   
-- Folder `notebooks` contains jupyter notebooks that generate the figures of the paper. These notebook expect a folder `alignments` to exist, containing amino acid or nucleotide alignments to be used.   
+- Folder `notebooks` contains jupyter notebooks that generate the figures of the paper. These notebook expect a folder `alignments` to exist, containing amino acid or nucleotide alignments to be used. 
 
