@@ -9,7 +9,7 @@ Pierre Barrat-Charlaix, John Huddleston, Trevor Bedford & Richard Neher
 You need Julia version 1.1 or higher to run this code, and IJulia to run the notebooks.  
 If you cloned this repository to your computer, navigate to it, start a julia REPL session and type  
 `]activate .`  
-followed by 
+followed by   
 `]registry add https://github.com/BioJulia/BioJuliaRegistry.git`  
 and  
 `]instantiate`  
