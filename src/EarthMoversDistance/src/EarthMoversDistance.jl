@@ -2,7 +2,8 @@ module EarthMoversDistance
 
 import JuMP
 import COSMO, MathOptInterface
-import BioTools
+# import BioTools
+using FluPredictibility.BioTools
 using BioSequences: BioSequence
 
 export EMD

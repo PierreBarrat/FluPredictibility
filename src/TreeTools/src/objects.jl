@@ -2,8 +2,6 @@ export TreeNode, Tree, Mutation
 export EvoData, LBIData, TreeNodeData
 export have_equal_children
 
-import Base: ==
-
 
 mutable struct Mutation
 	i::Int64

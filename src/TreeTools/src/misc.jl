@@ -1,4 +1,3 @@
-import Base.show 
 export print_tree, check_tree, nodeinfo, show
 
 function showinfo(tree::Tree)

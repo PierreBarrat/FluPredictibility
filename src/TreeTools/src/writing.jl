@@ -1,6 +1,5 @@
 export write_newick, write_fasta, write_newick!, write_branchlength
 
-using JSON
 
 """
 """

@@ -23,7 +23,4 @@ include("sequences.jl")
 include("IO.jl")
 include("filtering.jl")
 
-include("Flu/Flu.jl")
-
-
 end
