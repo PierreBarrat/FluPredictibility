@@ -11,8 +11,8 @@ First, clone this repository to your computer, navigate to it, start a julia ses
 `activate .`   
 followed by   
 `registry add https://github.com/BioJulia/BioJuliaRegistry.git`   
-`registry add https://github.com/JuliaRegistries/General.git` 
-and  
+`registry add https://github.com/JuliaRegistries/General.git`  
+and   
 `instantiate`  
 This will install all dependencies and make take a bit of time. 
 
