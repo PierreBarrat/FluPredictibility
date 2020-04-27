@@ -1,23 +1,24 @@
 # FluPredictibility
 This repository contains the code used in the article  
-``
-Limited predictability of clade frequencies of seasonal influenza viruses  
-Pierre Barrat-Charlaix, John Huddleston, Trevor Bedford & Richard Neher
-``  
+
+> Limited predictability of clade frequencies of seasonal influenza viruses   
+> Pierre Barrat-Charlaix, John Huddleston, Trevor Bedford & Richard Neher
+  
 
 ## Installing
-You need Julia version 1.1 or higher to run this code, and IJulia to run the notebooks.  
-If you cloned this repository to your computer, navigate to it, start a julia REPL session and type  
-`]activate .`  
+You need Julia version 1.4 or higher to run this code, and IJulia to run the notebooks.  
+First, clone this repository to your computer, navigate to it, start a julia session. Start the package manager mode by typing `]`. Then, successively enter (always in package manager mode)     
+`activate .`   
 followed by   
-`]registry add https://github.com/BioJulia/BioJuliaRegistry.git`  
+`registry add https://github.com/BioJulia/BioJuliaRegistry.git`   
+`registry add https://github.com/JuliaRegistries/General.git` 
 and  
-`]instantiate`  
-This will install all dependencies. 
+`instantiate`  
+This will install all dependencies and make take a bit of time. 
 
-We will then set up IJulia with  
-`]build IJulia`  
-You should now be able to start jupyter notebooks with   
+We will then set up IJulia with (still in package manager mode)
+`build IJulia`  
+Press backspace to exit the package manager mode. You should now be able to start jupyter notebooks with.    
 `using IJulia; IJulia.notebook()`  
 or by launching jupyter directly from your shell. 
     
