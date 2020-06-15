@@ -27,6 +27,8 @@ function compute_fitness!(traj::Array{<:FrequencyTraj,1}, fp::FluPop, ftype; tra
 		for t in traj
 			compute_treespread_fitness!(t, _tf, score = :squaredfreqs)
 		end
+	else 
+		@error "Unknown fitness type $(ftype)"
 	end
 end
 

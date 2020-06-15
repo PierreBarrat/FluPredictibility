@@ -151,7 +151,7 @@ end
 	population_size_condition(traj::Array{FrequencyTraj,1}, minpop)
 
 Select trajectories that are based on a total population of at least `minpop` for their whole duration.  
-Values of `mode`: `:overall` or `active`. 
+Values of `mode`: `:overall`, `active` or `:end`.
 """
 function population_size_condition(traj::Array{<:FrequencyTraj,1}, minpop; mode=:overall)
 	idx = zeros(Int64, 0)
@@ -165,6 +165,8 @@ function population_size_condition(traj::Array{<:FrequencyTraj,1}, minpop; mode=
 			end
 		elseif mode == :active
 			flag = ft.pop[ft.index[:active]] >= minpop
+		elseif mode == :end
+			flag = ft.pop[end] >= minpop
 		else
 			@error "Unrecognized mode $mode"
 		end

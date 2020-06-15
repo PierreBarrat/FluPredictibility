@@ -1,3 +1,5 @@
+is_flu_outlier() = nothing
+
  # Flu specific
 const lineages = ["h3n2" , "h1n1pdm", "vic", "yam"]
 # From genebank file of strain A/Beijing/32/1992
@@ -15,6 +17,19 @@ const nextstrain_regions = ["north_america", "south_america", "europe", "china",
 # 
 const flu_usual_header_fields = ["strain", "virus", "", "date", "region", "country", "", "", "", "segment"]
 const augur_all_header_fields = ["strain", "virus", "isolate_id", "date", "region", "country", "division", "location", "passage", "authors", "age", "gender"]
+flu_usual_filters(flulineage) = [!is_flu_outlier(flulineage), BioTools.hasdate, s->BioTools.gapfilter(s,threshold=0.05)]
+#
+function get_standard_coordinates(i::Int64; lineage="h3n2", gene="ha")
+	idx = sort([(k,x[2]/3) for (k,x) in Flu.gene_positions["h3n2", "ha"]], by=x->x[2])
+	offset=0
+	for (k,(ref,ix)) in enumerate(idx)
+		if i <= ix
+			return (ref, Int64(i-offset))
+		end
+		offset = ix
+	end
+	error("AA position $i too large for gene ($lineage,$gene)")
+end
 
 outliers = Dict{Union{String,Missing},Array{String}}(missing=>String[])
 for l in lineages

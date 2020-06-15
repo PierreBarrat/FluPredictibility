@@ -26,7 +26,7 @@ end
 Compute lbi of `strainsnames` according to tree `t`. Leaves of tree posterior to `datemax` or anterior to `datemin` are set to dead. Tree is modified in the process (life-state and lbi value of nodes). 
 Store the resulting lbi value in `fp.strains[lbi_field]`
 """
-function get_lbi!(t::Tree{LBIData}, fp::FluPop, strainnames::Array{<:AbstractString}, datemin, datemax, τ, lbi_field, verbose=true)
+function get_lbi!(t::Tree{LBIData}, fp::FluPop, strainnames::Array{<:AbstractString}, datemin, datemax, τ, lbi_field, verbose=false)
 	# Setting life-state of tree nodes
 	for node in values(t.leaves)
 		if haskey(fp.strains, node.label)
@@ -69,7 +69,7 @@ function get_lbi!(fp::FluPop, t::Tree{LBIData}, datestyle=:all_anterior;
 				segment="ha", 
 				τ=get_lbi_timescale(lineage,segment),
 				lbi_field=:lbi, 
-				verbose=true)
+				verbose=false)
 	# Find `datemin` as a function of `datestyle` 
 	if datestyle == :all_anterior
 		datemin = let val = findmin(collect(keys(fp.datebin)))[1][1]
@@ -81,7 +81,7 @@ function get_lbi!(fp::FluPop, t::Tree{LBIData}, datestyle=:all_anterior;
 		error("Accepted values for `datestyle`: `:all_anterior` or `:datebin`")
 	end
 	# Compute LBI for all datebins
-	for (datebin,strains) in sort(fp.datebin, by=x->x[1])
+	for (datebin,strains) in sort(OrderedDict(fp.datebin), by=x->x[1])
 		if length(strains)>1
 			labels = [x[:strain] for x in strains]
 			get_lbi!(t, fp, labels, datemin(datebin), max(datebin...), τ, lbi_field, verbose)

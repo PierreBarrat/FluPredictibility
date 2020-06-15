@@ -1,11 +1,7 @@
-module FluPredictibility
+module Flu
 
-include("BioTools/src/BioTools.jl")
-include("TreeTools/src/TreeTools.jl")
-include("EarthMoversDistance/src/EarthMoversDistance.jl")
-
-using FluPredictibility.BioTools
-using FluPredictibility.TreeTools
+using BioTools
+using TreeTools
 using BioSequences
 using Dates, DelimitedFiles, StatsBase, JSON, DataStructures
 
@@ -15,7 +11,6 @@ import Base.length
 export FluPop, AAFluPop
 export PosEvo
 export bin_by_date!
-
 # Should I implement a flu strain that has segment / flustrain fields and a ntseq field? 
 # For now, I'll do this for AAs only. 
 # One way might also be to do codon alphabets in BioSequence 

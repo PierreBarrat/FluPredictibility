@@ -150,3 +150,5 @@ function parse_date(s::AbstractString)
 	end
 	return date
 end
+
+parse_float(s::AbstractString) = parse(Float64, s)
