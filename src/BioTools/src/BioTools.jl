@@ -10,11 +10,11 @@ import Base.isempty, Base.length, Base.enumerate, Base.iterate
 import Base.show
 import BioSequences.alphabet, BioSequences.isambiguous
 
-
+global hello="hello"
+export hello
 
 export AbstractStrain, Strain
 export SiteFrequency, Profile
-export Flu
 export isambiguous, ambiguous
 
 include("global.jl")
