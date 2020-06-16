@@ -170,3 +170,22 @@ end
 function numdate(d::Date)
 	return year(d) + (month(d)-1) /12 + day(d) / 365
 end
+
+# Filters for IO
+"""
+"""
+is_flu_outlier(x::AbstractStrain, flulineage) = in(x[:strain], outliers[flulineage])
+function is_flu_outlier(flulineage)
+	return x->is_flu_outlier(x,flulineage)
+end
+
+"""
+	has_mutation(x::AbstractStrain, mutation)
+	has_mutation(mutation)
+
+Mutation `m` is expected to be of the form `(m[1], m[2])` (position, symbol). 
+"""
+has_mutation(x::AbstractStrain, mutation) = (x.seq[mutation[1]] == mutation[2])
+function has_mutation(mutation)
+	return x->has_mutation(x, mutation)
+end

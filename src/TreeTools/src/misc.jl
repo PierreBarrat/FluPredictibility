@@ -1,3 +1,4 @@
+import Base.show 
 export print_tree, check_tree, nodeinfo, show
 
 function showinfo(tree::Tree)
@@ -22,7 +23,7 @@ end
 """
 """
 function show(io::IO, tree::Tree)
-    if length(tree.nodes) < 30
+    if length(tree.nodes) < 40
         print_tree(tree)
     end
 end

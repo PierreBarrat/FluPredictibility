@@ -1,5 +1,6 @@
 # Declaration ... what is the clean way to do that? 
 parse_date() = nothing
+parse_float() = nothing
 
 ## FASTA headers
 const augur_header_reference = ["strain", "Strain", "STRAIN", "name", "Name", "label", "Label"]
@@ -8,8 +9,8 @@ const augur_header_virus = ["virus", "Virus"]
 const augur_minimal_fields = [:strain, :date, :virus]
 # Fieldnames below are IGNORED when reading a fasta file
 const ignored_header_fields = ["?", "", '?',:?]
-const special_fields = ["date", :date, "Date", :date]
-const parse_special_field = Dict("date" => parse_date, :date => parse_date, :Date => parse_date, "Date" => parse_date)
+const special_fields = ["date", :date, "Date", :date, :fitness]
+const parse_special_field = Dict("date" => parse_date, :date => parse_date, :Date => parse_date, "Date" => parse_date, :fitness =>parse_float)
 ## The following could be added to a BioSequences fork
 # const symbol_to_alphabet = Dict(BioSequences.AminoAcid => BioSequences.AminoAcidAlphabet,
 								# BioSequences.DNA => BioSequences.DNAAlphabet,

@@ -1,6 +1,7 @@
 using Distributions
+using FluPredictibility.BioTools
 
-function plot_all_trajectories(ph; yearticks=false, data=false, lw=2.5)
+function plot_all_trajectories(ph; yearticks=false, label=true, lw=2.5)
 	p = plot(size=(900,600))
 	for z in ph
 		X,Y,tmp,α = Flu.frequency_series(z)
@@ -8,11 +9,31 @@ function plot_all_trajectories(ph; yearticks=false, data=false, lw=2.5)
 			X = [year(x) + month(x) /12. for x in X]
 		end
 		for a in 1:size(Y,2)
-			plot!(p, X, Y[:,a], label="$(α[a])", linewidth=lw)
+			plot!(p, X, Y[:,a], label=label ? "$(α[a])" : "", linewidth=lw)
 		end
 	end
 	return p
 end
+
+function plot_all_trajectories(trajectories::Array{Flu.FrequencyTraj{A},1}; label=false, lw = 1) where A
+	p = plot(size=(900,600))
+	for traj in trajectories
+		X = traj.date .+ traj.t 
+		Y = traj.freq
+		lab = "$(traj.i) - $(traj.val)"
+		if traj.fixation == :fixed
+			st = (lw, :blue, 0.5)
+		elseif traj.fixation == :lost
+			st = (lw, :red, 0.5)
+		else
+			st = (lw, :black, :dashdot, 0.5)
+		end
+		plot!(p, X, Y, label = label ? lab : "", line=st)
+	end
+	plot!(p, frame=:box)
+	return p
+end
+
 
 function trajectory_freqbin(traj, alphabins)
 	freqtraj_cf = Dict()
@@ -53,7 +74,7 @@ function pfix(trajectories)
 	# 
 	xf = meanfreq(trajectories)
 	err = (errup, errdown)
-	return yf
+	return xf, yf, err
 end
 
 """
@@ -78,12 +99,14 @@ function pfix_v_freq(ph, alphabins)
 	errup = [x[3] for x in out]; errdown = [x[2] for x in out]
 	# 
 	err = (errup, errdown)
-	return sort(collect(keys(traj_fb))), yf, err
+	# return sort(collect(keys(traj_fb))), yf, err
+	# println(xf)
+	return xf, yf, err
 end
 
 """
 """
-function fitness_plot(trajectories, field; verbose=false)
+function fitness_plot(trajectories, field; verbose=false, dq = 0.)
     traj_fb = trajectory_freqbin(trajectories, alphabins);
     # 
     for (k,v) in traj_fb
@@ -95,15 +118,20 @@ function fitness_plot(trajectories, field; verbose=false)
     for (k,v) in traj_fb
         fvalues = [x.data[field][x.index[:active]] for x in v]
         medfit = median(fvalues)
+        # println(fvalues)
         verbose && println("Frequency $k -- median fitness $(medfit)")
-        high_fit[k] = v[findall(x->x.data[field][x.index[:active]] > medfit, v)]
-        low_fit[k] = v[findall(x->x.data[field][x.index[:active]] <= medfit, v)]
+        high_fit[k] = v[findall(x->x.data[field][x.index[:active]] > quantile(fvalues, 0.5 + dq), v)]
+        low_fit[k] = v[findall(x->x.data[field][x.index[:active]] <= quantile(fvalues, 0.5 - dq), v)]
     end
     # Arrays
-    dat = vcat([[x pfix(traj_fb[x])] for x in alphabins_]...)
-    dat_low = vcat([[x pfix(low_fit[x])] for x in alphabins_]...)
-    dat_high = vcat([[x pfix(high_fit[x])] for x in alphabins_]...)
+    dat = vcat([reshape(collect(pfix(traj_fb[x])), 1, 3) for x in alphabins_]...)
+    dat_low = vcat([reshape(collect(pfix(low_fit[x])), 1, 3) for x in alphabins_]...)
+    dat_high = vcat([reshape(collect(pfix(high_fit[x])), 1, 3) for x in alphabins_]...)
+    # dat = vcat([[meanfreq(traj_fb[x]) pfix(traj_fb[x])] for x in alphabins_]...)
+    # dat_low = vcat([[meanfreq(traj_fb[x]) pfix(low_fit[x])] for x in alphabins_]...)
+    # dat_high = vcat([[meanfreq(traj_fb[x]) pfix(high_fit[x])] for x in alphabins_]...)
     return dat, dat_low, dat_high
+    # return dat
 end
 
 """

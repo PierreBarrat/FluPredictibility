@@ -7,7 +7,7 @@ include("EarthMoversDistance/src/EarthMoversDistance.jl")
 using FluPredictibility.BioTools
 using FluPredictibility.TreeTools
 using BioSequences
-using Dates, DelimitedFiles, StatsBase, JSON
+using Dates, DelimitedFiles, StatsBase, JSON, DataStructures
 
 import StatsBase.entropy
 import Base.length

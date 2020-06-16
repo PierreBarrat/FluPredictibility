@@ -9,7 +9,7 @@ function FluPop(f::Union{AbstractString,IO},
 	headerfields; 
 	flulineage=missing, 
 	segment=missing, 
-	strainfilters = [!is_flu_outlier(flulineage), BioTools.hasdate, s->BioTools.gapfilter(s,threshold=0.05)],
+	strainfilters = flu_usual_filters(flulineage),
 	separator = '|', 
 	ignore_read_errors=false)	
 	
@@ -24,15 +24,11 @@ Call `FluPop(f, :aa, headerfields, [kwargs...])
 function AAFluPop(f::Union{AbstractString,IO}, headerfields; 
 	flulineage=missing, 
 	segment=missing, 
-	strainfilters = [!is_flu_outlier(flulineage), BioTools.hasdate],
+	strainfilters = flu_usual_filters(flulineage),
 	separator = '|')
 	return FluPop(f, :aa, headerfields, flulineage=flulineage, segment=segment, strainfilters=strainfilters, separator=separator)
 end
 
-is_flu_outlier(x::AbstractStrain, flulineage) = in(x[:strain], outliers[flulineage])
-function is_flu_outlier(flulineage)
-	return x->is_flu_outlier(x,flulineage)
-end
 
 """
 	read_mutations!(tree::Tree, mutfile::String)
@@ -57,7 +53,7 @@ function read_mutations_aa!(tree, mutfile::String, lineage, segment)
 	for (label, mut) in muts
 		if haskey(tree.lnodes, label)
 			tmp = Array{TreeTools.Mutation}(undef, 0)
-			for (gene, pos) in Flu.gene_positions[lineage, segment]
+			for (gene, pos) in gene_positions[lineage, segment]
 				if !haskey(mut["aa_muts"], "HA1")
 					println(label); 
 				else

@@ -1,7 +1,6 @@
 export parse_newick!, nw_parse_children, nw_parse_name, read_newick, read_tree
 export fasta2tree!, seq2num
 
-
 let n::Int64=0
 	global increment_n() = (n+=1)
 	global reset_n() = (n=0)
@@ -43,11 +42,13 @@ function read_newick(nw_file::String; NodeDataType=EvoData)
 	nw = nw[1:end-1]
 
 	reset_n()
+	root = parse_newick(nw, NodeDataType=NodeDataType)
+	return root
+end
+function parse_newick(nw::String; NodeDataType=EvoData)
 	root = TreeNode(NodeDataType())
 	parse_newick!(nw, root, NodeDataType)
 	root.isroot = true # Rooting the tree with outer-most node of the newick string
-	close(f)
-
 	return root
 end
 

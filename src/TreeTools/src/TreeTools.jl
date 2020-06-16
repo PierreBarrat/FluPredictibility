@@ -1,12 +1,9 @@
 module TreeTools
 
-using Dates
-using JSON
+
 using FastaIO
-
-import Base: ==
-import Base.show 
-
+using JSON
+using Dates
 ## Includes
 include("objects.jl")
 include("objectsmethods.jl")
