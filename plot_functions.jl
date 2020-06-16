@@ -1,5 +1,5 @@
 using Distributions
-using BioTools
+using FluPredictibility.BioTools
 
 function plot_all_trajectories(ph; yearticks=false, label=true, lw=2.5)
 	p = plot(size=(900,600))

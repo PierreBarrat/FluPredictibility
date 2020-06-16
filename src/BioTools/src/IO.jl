@@ -65,6 +65,8 @@ function readfastastrains(f::Union{AbstractString,IO}, ::Val{A}, headerfields; s
 		catch err
 			if ignore_read_errors
 				st = Strain(:aa)
+			elseif occursin("X",s)
+				st = Strain(LongSequence{A}(replace(s, "X"=>"N")), dat)
 			else
 				println(s)
 				error(err)

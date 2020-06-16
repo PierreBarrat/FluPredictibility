@@ -2,8 +2,7 @@ module EarthMoversDistance
 
 import JuMP
 import COSMO, MathOptInterface
-# import BioTools
-using FluPredictibility.BioTools
+import FluPredictibility.BioTools
 using BioSequences: BioSequence
 
 export EMD
@@ -23,7 +22,7 @@ function EMD(f::Function,P,Q)
 		end
 	end
 	# Building the JuMP model
-	model = JuMP.Model(JuMP.with_optimizer(COSMO.Optimizer))
+	model = JuMP.Model(COSMO.Optimizer)
 	JuMP.set_silent(model)
 	JuMP.@variable(model, w[i=1:length(P), j=1:length(Q)] >= 0)
 	for (i,(x,p)) in enumerate(P)
