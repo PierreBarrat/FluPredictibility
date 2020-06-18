@@ -1,10 +1,14 @@
 using Distributions
 using FluPredictibility.BioTools
 
+export plot_all_trajectories
+export pfix, pfix_v_freq, pfix_v_freq_positivederivative, fitness_plot, meanfreq
+
+
 function plot_all_trajectories(ph; yearticks=false, label=true, lw=2.5)
 	p = plot(size=(900,600))
 	for z in ph
-		X,Y,tmp,α = Flu.frequency_series(z)
+		X,Y,tmp,α = frequency_series(z)
 		if yearticks
 			X = [year(x) + month(x) /12. for x in X]
 		end
@@ -15,7 +19,7 @@ function plot_all_trajectories(ph; yearticks=false, label=true, lw=2.5)
 	return p
 end
 
-function plot_all_trajectories(trajectories::Array{Flu.FrequencyTraj{A},1}; label=false, lw = 1) where A
+function plot_all_trajectories(trajectories::Array{FrequencyTraj{A},1}; label=false, lw = 1) where A
 	p = plot(size=(900,600))
 	for traj in trajectories
 		X = traj.date .+ traj.t 
@@ -38,7 +42,7 @@ end
 function trajectory_freqbin(traj, alphabins)
 	freqtraj_cf = Dict()
 	for (α,dα) in alphabins
-	    freqtraj_cf[α] = Flu.frequency_condition(traj, α, dα=dα)
+	    freqtraj_cf[α] = frequency_condition(traj, α, dα=dα)
 	end
 	return freqtraj_cf
 end
@@ -80,13 +84,13 @@ end
 """
 """
 function pfix_v_freq(ph, alphabins)
-	trajectories = Flu.all_trajectories(ph, keep_unfinished=false)
-	trajectories = Flu.previous_state_condition(trajectories, :lost)
+	trajectories = all_trajectories(ph, keep_unfinished=false)
+	trajectories = previous_state_condition(trajectories, :lost)
 	# Binning by frequency
-	traj_fb = sort(trajectory_freqbin(trajectories, alphabins));
+	traj_fb = sort(OrderedDict(trajectory_freqbin(trajectories, alphabins)));
 	# Keeping only trajectories that have a frequency backed by 50 strains at the time where it is binned. 
 	for (k,v) in traj_fb
-	    traj_fb[k] = Flu.population_size_condition(v, 20, mode=:active)
+	    traj_fb[k] = population_size_condition(v, 20, mode=:active)
 	end
 	# 
 	n = [length(traj_fb[x]) for x in keys(traj_fb)] # For error bars
@@ -106,11 +110,11 @@ end
 
 """
 """
-function fitness_plot(trajectories, field; verbose=false, dq = 0.)
+function fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0.)
     traj_fb = trajectory_freqbin(trajectories, alphabins);
     # 
     for (k,v) in traj_fb
-        traj_fb[k] = Flu.population_size_condition(v, 20, mode=:active)
+        traj_fb[k] = population_size_condition(v, 20, mode=:active)
     end   
     # High and low fitnesses
     high_fit = Dict()
@@ -124,9 +128,9 @@ function fitness_plot(trajectories, field; verbose=false, dq = 0.)
         low_fit[k] = v[findall(x->x.data[field][x.index[:active]] <= quantile(fvalues, 0.5 - dq), v)]
     end
     # Arrays
-    dat = vcat([reshape(collect(pfix(traj_fb[x])), 1, 3) for x in alphabins_]...)
-    dat_low = vcat([reshape(collect(pfix(low_fit[x])), 1, 3) for x in alphabins_]...)
-    dat_high = vcat([reshape(collect(pfix(high_fit[x])), 1, 3) for x in alphabins_]...)
+    dat = vcat([reshape(collect(pfix(traj_fb[x[1]])), 1, 3) for x in alphabins]...)
+    dat_low = vcat([reshape(collect(pfix(low_fit[x[1]])), 1, 3) for x in alphabins]...)
+    dat_high = vcat([reshape(collect(pfix(high_fit[x[1]])), 1, 3) for x in alphabins]...)
     # dat = vcat([[meanfreq(traj_fb[x]) pfix(traj_fb[x])] for x in alphabins_]...)
     # dat_low = vcat([[meanfreq(traj_fb[x]) pfix(low_fit[x])] for x in alphabins_]...)
     # dat_high = vcat([[meanfreq(traj_fb[x]) pfix(high_fit[x])] for x in alphabins_]...)
@@ -137,14 +141,14 @@ end
 """
 """
 function pfix_v_freq_positivederivative(ph, alphabins)
-	trajectories = Flu.all_trajectories(ph, keep_unfinished=false)
-	trajectories = Flu.previous_state_condition(trajectories, :lost)
+	trajectories = all_trajectories(ph, keep_unfinished=false)
+	trajectories = previous_state_condition(trajectories, :lost)
 	# Binning by frequency
-	traj_fb = sort(trajectory_freqbin(trajectories, alphabins));
+	traj_fb = sort(OrderedDict(trajectory_freqbin(trajectories, alphabins)));
 	# Keeping only trajectories that have a frequency backed by 50 strains at the time where it is binned. 
 	for (k,v) in traj_fb
-	    traj_fb[k] = Flu.population_size_condition(v, 20, mode=:active)
-	    traj_fb[k] = Flu.derivative_condition(traj_fb[k])
+	    traj_fb[k] = population_size_condition(v, 20, mode=:active)
+	    traj_fb[k] = derivative_condition(traj_fb[k])
 	end
 	# 
 	n = [length(traj_fb[x]) for x in keys(traj_fb)] # For error bars

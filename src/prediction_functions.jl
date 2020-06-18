@@ -1,5 +1,7 @@
 using JSON
 
+export split_in_clades, dates_to_tree!, closest_tree_leaf, cluster_lbi_maxima!
+
 """
 Split strains in clades using a timetree. Two leaves `n1` and `n2` belong to the same clade if and only if `lca(n1,n2)` lives after `datethr`. 
 """
