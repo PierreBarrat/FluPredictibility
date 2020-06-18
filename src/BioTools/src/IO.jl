@@ -67,6 +67,8 @@ function readfastastrains(f::Union{AbstractString,IO}, ::Val{A}, headerfields; s
 				st = Strain(:aa)
 			elseif occursin("X",s)
 				st = Strain(LongSequence{A}(replace(s, "X"=>"N")), dat)
+			elseif occursin("x",s)
+				st = Strain(LongSequence{A}(replace(s, "x"=>"N")), dat)
 			else
 				println(s)
 				error(err)
@@ -84,7 +86,7 @@ function readfastastrains(f::Union{AbstractString,IO}, ::Val{A}, headerfields; s
 	println("Read $(length(strains)) strains out of $ntot. Filtered $nfiltered. Could not read $nunread")
 	return strains	
 end
-function readfastastrains(f::Union{AbstractString,IO}, ::Val{A}, headerfields; separator = '|', strainfilters=[x->true]) where A <: Integer
+function readfastastrains(f::Union{AbstractString,IO}, ::Val{A}, headerfields; separator = '|', strainfilters=[x->true], ignore_read_errors=false) where A <: Integer
 	strains = Array{ArtificialStrain{A},1}(undef, 0)
 	nfiltered = 0
 	nunread = 0
