@@ -86,5 +86,6 @@ include("lbi.jl")
 include("fitness.jl")
 include("plot_functions.jl")
 include("prediction_functions.jl")
+include("misc.jl")
 
 end
