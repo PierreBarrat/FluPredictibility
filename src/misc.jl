@@ -1,5 +1,5 @@
 using DelimitedFiles
-using BioTools
+using FluPredictibility.BioTools
 
 """
 	`true` if position only has one amino acid 
