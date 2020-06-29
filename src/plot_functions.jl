@@ -1,4 +1,4 @@
-using Distributions
+using Distributions, Plots
 using FluPredictibility.BioTools
 
 export plot_all_trajectories
@@ -77,21 +77,23 @@ function pfix(trajectories)
 	yf, errdown, errup = bernoulli_estimator.(x,n)
 	# 
 	xf = meanfreq(trajectories)
-	err = (errup, errdown)
+	err = (errdown, errup)
 	return xf, yf, err
 end
 
 """
 """
-function pfix_v_freq(ph, alphabins)
+function pfix_v_freq(ph, alphabins; v=false)
 	trajectories = all_trajectories(ph, keep_unfinished=false)
 	trajectories = previous_state_condition(trajectories, :lost)
 	# Binning by frequency
 	traj_fb = sort(OrderedDict(trajectory_freqbin(trajectories, alphabins)));
-	# Keeping only trajectories that have a frequency backed by 50 strains at the time where it is binned. 
+	# Keeping only trajectories that have a frequency backed by 20 strains at the time where it is binned. 
 	for (k,v) in traj_fb
 	    traj_fb[k] = population_size_condition(v, 20, mode=:active)
 	end
+	#
+	v && println("Based on a total of $(sum(length(v) for v in values(traj_fb))) trajectories")
 	# 
 	n = [length(traj_fb[x]) for x in keys(traj_fb)] # For error bars
 	x = [count(t->t.fixation==:fixed, traj_fb[x]) for x in keys(traj_fb)]
@@ -102,7 +104,7 @@ function pfix_v_freq(ph, alphabins)
 	# yf = [count(t->t.fixation==:fixed, traj_fb[x])/length(traj_fb[x]) for x in keys(traj_fb)]
 	errup = [x[3] for x in out]; errdown = [x[2] for x in out]
 	# 
-	err = (errup, errdown)
+	err = (errdown, errup)
 	# return sort(collect(keys(traj_fb))), yf, err
 	# println(xf)
 	return xf, yf, err
@@ -159,11 +161,10 @@ function pfix_v_freq_positivederivative(ph, alphabins)
 	yf = [x[1] for x in out]; 
 	errup = [x[3] for x in out]; errdown = [x[2] for x in out]
 	# 
-	err = (errup, errdown)
+	err = (errdown, errup)
 	return xf, yf, err
 end
 
+function mean_trajectory()
 
-# function plot_ph(ph)
-# 	p = plot(size=(900,600))
-# 	X,Y,tmp,ab = 
+end	

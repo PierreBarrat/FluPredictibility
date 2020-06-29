@@ -3,10 +3,14 @@ is_flu_outlier() = nothing
  # Flu specific
 const lineages = ["h3n2" , "h1n1pdm", "vic", "yam"]
 # From genebank file of strain A/Beijing/32/1992
-const CDS = Dict(("h3n2","na") => [(4,1410)],
-	("h3n2","ha") => [(1,48),(49,1035),(1036,1698)])
-const gene_positions = Dict(("h3n2","na") => Dict("NA" => (4,1410)),
-	("h3n2","ha") => Dict("SigPep" => (1,48), "HA1" => (49,1035), "HA2" => (1036,1698)))
+const CDS = Dict(("h3n2","na") => [(1,1410)],
+				("h3n2","ha") => [(1,48),(49,1035),(1036,1698)],
+				("h1n1pdm","na") => [(1,1410)],
+				("h1n1pdm","ha") => [(1,48),(49,1035),(1036,1698)])
+const gene_positions = Dict(("h3n2","na") => Dict("NA" => (1,1410)),
+	("h3n2","ha") => Dict("SigPep" => (1,48), "HA1" => (49,1035), "HA2" => (1036,1698)),
+							("h1n1pdm","na") => Dict("NA" => (4,1410)),
+	("h1n1pdm","ha") => Dict("SigPep" => (1,48), "HA1" => (49,1035), "HA2" => (1036,1698)))
 const substitution_rate = Dict(("h3n2","ha")=>4e-3, ("h3n2","na")=>3e-3) # Number of substitutions per site per year for NUCLEOTIDES
 # Note: it's quite similar for AAs 
 global coalescence_time = Year(6)

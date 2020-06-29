@@ -54,9 +54,7 @@ function read_mutations_aa!(tree, mutfile::String, lineage, segment)
 		if haskey(tree.lnodes, label)
 			tmp = Array{TreeTools.Mutation}(undef, 0)
 			for (gene, pos) in gene_positions[lineage, segment]
-				if !haskey(mut["aa_muts"], "HA1")
-					println(label); 
-				else
+				if haskey(mut["aa_muts"], gene)
 					for m in mut["aa_muts"][gene]
 						push!(tmp, _parse_aa_mut(m))
 						tmp[end].i = tmp[end].i + Int64((pos[1] - 1)/3) # Offset for different genes

@@ -1,0 +1,2 @@
+/home/pierrebc/Documents/BaleLabo/Notes/FluPredictibility/Article/Figures
+/home/pierrebc/Documents/BaleLabo/Notes/FluPredictibility/Article/SM_figures
