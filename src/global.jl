@@ -12,6 +12,12 @@ const gene_positions = Dict(("h3n2","na") => Dict("NA" => (4,1410)),
 	("h3n2","ha") => Dict("SigPep" => (1,48), "HA1" => (49,1035), "HA2" => (1036,1698)),
 	("h1n1pdm", "na") => Dict("NA" => (9,1418)), 
 	("h1n1pdm", "ha") => Dict("SigPep"=>(21,71), "HA1"=>(72,1052), "HA2"=>(1053, 1718)))
+# Offsets for going from local to global coordinates on proteins (mainly HA). 
+# Somehow, nextstrain misses one AA between SigPep and HA1, and another betw HA1 and HA2. Maybe stop codons that I translated? Anyway, that's why the 17 and 344 = 327 + 17 for h1n1pdm for example
+const gene_offsets = Dict(("h1n1pdm","ha") => Dict("SigPep" => 0, "HA1" => 17, "HA2" => 344),
+						("h1n1pdm","na") => Dict("NA" => 0),
+						("h3n2","ha") => Dict("SigPep" => 0, "HA1" => 16, "HA2" => 345),
+						("h3n2","na") => Dict("NA" => 0))
 
 const substitution_rate = Dict(("h3n2","ha")=>4e-3, ("h3n2","na")=>3e-3) # Number of substitutions per site per year for NUCLEOTIDES
 # Note: it's quite similar for AAs 

@@ -16,6 +16,7 @@ function plot_all_trajectories(ph; yearticks=false, label=true, lw=2.5)
 			plot!(p, X, Y[:,a], label=label ? "$(α[a])" : "", linewidth=lw)
 		end
 	end
+	plot!(p, ylim=(-0.05,1.05))
 	return p
 end
 
@@ -111,8 +112,11 @@ function pfix_v_freq(ph, alphabins; v=false)
 end
 
 """
+	fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0., alldat=false)
+
+Trajectories higher or lower than median fitness.
 """
-function fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0.)
+function fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0., alldat=false)
     traj_fb = trajectory_freqbin(trajectories, alphabins);
     # 
     for (k,v) in traj_fb
@@ -121,11 +125,12 @@ function fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0.)
     # High and low fitnesses
     high_fit = Dict()
     low_fit = Dict()
+    medfit = Dict()
     for (k,v) in traj_fb
         fvalues = [x.data[field][x.index[:active]] for x in v]
-        medfit = median(fvalues)
+        medfit[k] = median(fvalues)
         # println(fvalues)
-        verbose && println("Frequency $k -- median fitness $(medfit)")
+        verbose && println("Frequency $k -- median fitness $(medfit[k])")
         high_fit[k] = v[findall(x->x.data[field][x.index[:active]] > quantile(fvalues, 0.5 + dq), v)]
         low_fit[k] = v[findall(x->x.data[field][x.index[:active]] <= quantile(fvalues, 0.5 - dq), v)]
     end
@@ -133,11 +138,36 @@ function fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0.)
     dat = vcat([reshape(collect(pfix(traj_fb[x[1]])), 1, 3) for x in alphabins]...)
     dat_low = vcat([reshape(collect(pfix(low_fit[x[1]])), 1, 3) for x in alphabins]...)
     dat_high = vcat([reshape(collect(pfix(high_fit[x[1]])), 1, 3) for x in alphabins]...)
-    # dat = vcat([[meanfreq(traj_fb[x]) pfix(traj_fb[x])] for x in alphabins_]...)
-    # dat_low = vcat([[meanfreq(traj_fb[x]) pfix(low_fit[x])] for x in alphabins_]...)
-    # dat_high = vcat([[meanfreq(traj_fb[x]) pfix(high_fit[x])] for x in alphabins_]...)
+	#
+    alldat && return dat, dat_low, dat_high, traj_fb, high_fit, low_fit, medfit
     return dat, dat_low, dat_high
-    # return dat
+end
+"""
+	fitness_plot(trajectories, field, alphabins, fitval; verbose=false alldat=false)
+
+Trajectories higher or lower than `fitval` for field `field`. 
+"""
+function fitness_plot(trajectories, field, alphabins, fitval; verbose=false, alldat=false)
+    traj_fb = trajectory_freqbin(trajectories, alphabins);
+    # 
+    for (k,v) in traj_fb
+        traj_fb[k] = population_size_condition(v, 20, mode=:active)
+    end   
+    # High and low fitnesses
+    high_fit = Dict()
+    low_fit = Dict()
+    medfit = Dict()
+    for (k,v) in traj_fb
+        high_fit[k] = v[findall(x->x.data[field][x.index[:active]] > fitval, v)]
+        low_fit[k] = v[findall(x->x.data[field][x.index[:active]] <= fitval, v)]
+    end
+    # Arrays
+    dat = vcat([reshape(collect(pfix(traj_fb[x[1]])), 1, 3) for x in alphabins]...)
+    dat_low = vcat([reshape(collect(pfix(low_fit[x[1]])), 1, 3) for x in alphabins]...)
+    dat_high = vcat([reshape(collect(pfix(high_fit[x[1]])), 1, 3) for x in alphabins]...)
+	#
+    alldat && return dat, dat_low, dat_high, traj_fb, high_fit, low_fit, medfit
+    return dat, dat_low, dat_high
 end
 
 """
