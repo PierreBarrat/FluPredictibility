@@ -39,6 +39,10 @@ function plot_all_trajectories(trajectories::Array{FrequencyTraj{A},1}; label=fa
 	return p
 end
 
+plot_trajectory(traj::FrequencyTraj) = plot(traj.date .+ traj.t, traj.freq, label="$(traj.i) - $(traj.val)")
+plot_trajectory!(p, traj::FrequencyTraj) = plot!(p, traj.date .+ traj.t, traj.freq, label="$(traj.i) - $(traj.val)")
+
+
 
 function trajectory_freqbin(traj, alphabins)
 	freqtraj_cf = Dict()
@@ -83,18 +87,28 @@ function pfix(trajectories)
 end
 
 """
+	pfix_v_freq(ph, alphabins; v=false, effective=false, effective_kwargs=(clustering=:naive, distance=:strains))
+
+Used for clustering trajectories. Needs `fp` as an argument since trajectory distance is by default based on common strains. 
 """
-function pfix_v_freq(ph, alphabins; v=false)
+function pfix_v_freq(ph, fp::FluPop, alphabins; 
+	v=false, effective=false, effective_kwargs=(clustering=:naive, distance=:strains), outn=false)
 	trajectories = all_trajectories(ph, keep_unfinished=false)
 	trajectories = previous_state_condition(trajectories, :lost)
+	get_strains!(trajectories, fp)
 	# Binning by frequency
 	traj_fb = sort(OrderedDict(trajectory_freqbin(trajectories, alphabins)));
 	# Keeping only trajectories that have a frequency backed by 20 strains at the time where it is binned. 
-	for (k,v) in traj_fb
-	    traj_fb[k] = population_size_condition(v, 20, mode=:active)
+	for (k,trajs) in traj_fb
+	    traj_fb[k] = population_size_condition(trajs, 20, mode=:active)
+	    if effective
+	    	n0 = length(traj_fb[k])
+			traj_fb[k] = effective_trajectories(traj_fb[k]; effective_kwargs...)
+			v && println("Freq. bin $k: $n0 --> $(length(traj_fb[k])) effective trajectories")
+		end
 	end
 	#
-	v && println("Based on a total of $(sum(length(v) for v in values(traj_fb))) trajectories")
+	# v && println("Based on a total of $(sum(length(v) for v in values(traj_fb))) trajectories")
 	# 
 	n = [length(traj_fb[x]) for x in keys(traj_fb)] # For error bars
 	x = [count(t->t.fixation==:fixed, traj_fb[x]) for x in keys(traj_fb)]
@@ -108,8 +122,47 @@ function pfix_v_freq(ph, alphabins; v=false)
 	err = (errdown, errup)
 	# return sort(collect(keys(traj_fb))), yf, err
 	# println(xf)
-	return xf, yf, err
+	if outn
+		return xf, yf, err, n
+	else
+		return xf, yf, err
+	end
 end
+"""
+	pfix_v_freq(ph, alphabins; v=false)
+
+Usual function used for main text plots. 
+"""
+function pfix_v_freq(ph, alphabins; v=false, outn=false)
+	trajectories = all_trajectories(ph, keep_unfinished=false)
+	trajectories = previous_state_condition(trajectories, :lost)
+	# Binning by frequency
+	traj_fb = sort(OrderedDict(trajectory_freqbin(trajectories, alphabins)));
+	# Keeping only trajectories that have a frequency backed by 20 strains at the time where it is binned. 
+	for (k,trajs) in traj_fb
+	    traj_fb[k] = population_size_condition(trajs, 20, mode=:active)
+	end
+	#
+	# v && println("Based on a total of $(sum(length(v) for v in values(traj_fb))) trajectories")
+	# 
+	n = [length(traj_fb[x]) for x in keys(traj_fb)] # For error bars
+	x = [count(t->t.fixation==:fixed, traj_fb[x]) for x in keys(traj_fb)]
+	out = bernoulli_estimator.(x,n)
+	# 
+	xf = [meanfreq(traj_fb[x]) for x in keys(traj_fb)]
+	yf = [x[1] for x in out]; 
+	# yf = [count(t->t.fixation==:fixed, traj_fb[x])/length(traj_fb[x]) for x in keys(traj_fb)]
+	errup = [x[3] for x in out]; errdown = [x[2] for x in out]
+	# 
+	err = (errdown, errup)
+	# return sort(collect(keys(traj_fb))), yf, err
+	# println(xf)
+	if outn
+		return xf, yf, err, n
+	else
+		return xf, yf, err
+	end
+end 
 
 """
 	fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0., alldat=false)

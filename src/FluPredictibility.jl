@@ -8,6 +8,7 @@ using FluPredictibility.BioTools
 using FluPredictibility.TreeTools
 using BioSequences
 using Dates, DelimitedFiles, StatsBase, JSON, DataStructures
+using Polynomials
 
 import StatsBase.entropy
 import Base.length
