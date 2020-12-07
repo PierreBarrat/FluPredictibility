@@ -79,7 +79,7 @@ closest_tree_leaf(r::String, t::Tree, candidates::Array{<:AbstractString,1}) = c
 Cluster sequences of each datebin in `fp.datebin` using local maximas of the LBI for the tree of that datebin. 
 """
 function cluster_lbi_maxima!(t::Tree, fp)
-	LLM = Flu.local_lbi_maximas!(t, fp);
+	LLM = local_lbi_maximas!(t, fp);
 	clusters = Dict()
 	lbis = Dict()
 	for (db, llm) in LLM

@@ -20,10 +20,16 @@ function plot_all_trajectories(ph; yearticks=false, label=true, lw=2.5)
 	return p
 end
 
-function plot_all_trajectories(trajectories::Array{FrequencyTraj{A},1}; label=false, lw = 1) where A
+function plot_all_trajectories(trajectories::Array{FrequencyTraj{A},1}; label=false, lw = 1, yearticks=false) where A
 	p = plot(size=(900,600))
+	dmin=missing; dmax=missing
 	for traj in trajectories
 		X = traj.date .+ traj.t 
+		if yearticks
+			X = [year(x) + month(x) /12. for x in X]
+			dmin = ismissing(dmin) ? minimum(X) : min(dmin, minimum(X))
+			dmax = ismissing(dmax) ? maximum(X) : max(dmax, maximum(X))
+		end
 		Y = traj.freq
 		lab = "$(traj.i) - $(traj.val)"
 		if traj.fixation == :fixed
@@ -35,7 +41,7 @@ function plot_all_trajectories(trajectories::Array{FrequencyTraj{A},1}; label=fa
 		end
 		plot!(p, X, Y, label = label ? lab : "", line=st)
 	end
-	plot!(p, frame=:box)
+	plot!(p, frame=:box, xticks=floor(dmin):ceil(dmax))
 	return p
 end
 
@@ -78,8 +84,8 @@ meanfreq(traj) = mean(t.freq[t.index[:active]] for t in traj)
 """
 function pfix(trajectories)
 	n = length(trajectories)
-	x = count(t->t.fixation==:fixed, trajectories)
-	yf, errdown, errup = bernoulli_estimator.(x,n)
+	y = count(t->t.fixation==:fixed, trajectories)
+	yf, errdown, errup = bernoulli_estimator.(y,n)
 	# 
 	xf = meanfreq(trajectories)
 	err = (errdown, errup)
@@ -179,16 +185,20 @@ function fitness_plot(trajectories, field, alphabins; verbose=false, dq = 0., al
     high_fit = Dict()
     low_fit = Dict()
     medfit = Dict()
+    all_fit = Dict()
     for (k,v) in traj_fb
-        fvalues = [x.data[field][x.index[:active]] for x in v]
+        fvalues = collect(skipmissing([x.data[field][x.index[:active]] for x in v]))
         medfit[k] = median(fvalues)
         # println(fvalues)
         verbose && println("Frequency $k -- median fitness $(medfit[k])")
-        high_fit[k] = v[findall(x->x.data[field][x.index[:active]] > quantile(fvalues, 0.5 + dq), v)]
-        low_fit[k] = v[findall(x->x.data[field][x.index[:active]] <= quantile(fvalues, 0.5 - dq), v)]
+        fitness(x) = x.data[field][x.index[:active]]
+        all_fit[k] = v[findall(x->!ismissing(fitness(x)), v)]
+        high_fit[k] = v[findall(x->!ismissing(fitness(x)) && fitness(x) > quantile(fvalues, 0.5 + dq), v)]
+        low_fit[k] = v[findall(x->!ismissing(fitness(x)) && fitness(x) <= quantile(fvalues, 0.5 - dq), v)]
     end
     # Arrays
-    dat = vcat([reshape(collect(pfix(traj_fb[x[1]])), 1, 3) for x in alphabins]...)
+    # dat = vcat([reshape(collect(pfix(traj_fb[x[1]])), 1, 3) for x in alphabins]...)
+    dat = vcat([reshape(collect(pfix(all_fit[x[1]])), 1, 3) for x in alphabins]...)
     dat_low = vcat([reshape(collect(pfix(low_fit[x[1]])), 1, 3) for x in alphabins]...)
     dat_high = vcat([reshape(collect(pfix(high_fit[x[1]])), 1, 3) for x in alphabins]...)
 	#

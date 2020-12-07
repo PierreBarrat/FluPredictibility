@@ -66,7 +66,7 @@ EMD(X::Array{<:BioSequence,1},Y::Array{<:BioSequence,1}) = EMD(BioTools.hamming,
 EMD(f::Function, X::Array{<:BioTools.AbstractStrain,1}, Y::Array{<:BioTools.AbstractStrain,1}) = EMD(f, 
 	[x.seq for x in X], [y.seq for y in Y])
 EMD(X::Array{<:BioTools.AbstractStrain,1}, Y::Array{<:BioTools.AbstractStrain,1}) = EMD([x.seq for x in X], [y.seq for y in Y])
-EMD(P::Dict{<:BioSequence,Float64}, Q::Dict{<:BioSequence,Float64}) = EMD(BioTools.hamming, P, Q)
+EMD(P::AbstractDict{<:BioSequence,Float64}, Q::AbstractDict{<:BioSequence,Float64}) = EMD(BioTools.hamming, P, Q)
 
 """
 	sequence_distribution(X::Array{<:BioSequence})

@@ -111,7 +111,7 @@ The idea is to find local maximas of the LBI for each date bin of `fp`. In order
 function local_lbi_maximas!(t::Tree{LBIData}, fp::FluPop, τ=get_lbi_timescale("h3n2","ha"))
 	out = Dict()
 	# Setting nodes alive in date order
-	for (db, strains) in sort(fp.datebin, by=x->x[1])
+	for (db, strains) in sort(OrderedDict(fp.datebin), by=x->x[1])
 		for n in values(t.lnodes)
 			n.data.alive = false
 		end

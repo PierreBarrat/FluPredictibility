@@ -8,7 +8,7 @@ function compute_fitness!(traj::Array{<:FrequencyTraj,1}, fp::FluPop, ftype; tra
 	_tf = (ftype == :strains && trajfield == Symbol(ftype,:_fitness)) ? Symbol(strainfield,:_fitness) : trajfield
 	# 
 	for t in traj
-		t.data[_tf] = zeros(Float64, length(t))
+		t.data[_tf] = zeros(Union{Float64, Missing}, length(t))
 	end
 	# 
 	if ftype == :strains
@@ -57,13 +57,14 @@ function compute_strains_fitness!(traj::FrequencyTraj, fp::FluPop, strainfield=:
 		# Strains in trajectory
 		Ntraj = count(x->!ismissing(fp.strains[x][strainfield]), strains)
 		Ftraj = mapreduce(x->ismissing(fp.strains[x][strainfield]) ? 0. : fp.strains[x][strainfield], +, strains, init=0.) 
+		# Ftraj = mapreduce(x->fp.strains[x][strainfield], +, strains, init=0.)
 		# All strains in the datebin
 		N = count(x->!ismissing(x[strainfield]), fp.datebin[db])
 		F = mapreduce(x->ismissing(x[strainfield]) ? 0. : x[strainfield], +, fp.datebin[db], init=0.) 
 		if ismissing(F) || ismissing(Ftraj)
 			traj.data[trajfield][i] = missing # This would be the proper way to do it. 
 		elseif Ntraj == 0 || Ntraj == N
-			traj.data[trajfield][i] = 0.
+			traj.data[trajfield][i] = missing
 		elseif N > Ntraj
 			if shift==:exclusive_mean
 				traj.data[trajfield][i] = Ftraj/Ntraj  -  (F - Ftraj)/(N - Ntraj)
@@ -119,5 +120,21 @@ function compute_region_entropy(regionspread; scoretype=:entropy)
 		return StatsBase.entropy(x)
 	else
 		@error "`scoretype` can be `:squaredfreqs` or `:entropy`"
+	end
+end
+
+"""
+	get_strain_fitness!(fp::FluPop, df::DataFrame, field)
+
+Get fitness of strains from a `DataFrame` object. `df` should have columns `:strain` and `fitness`. 
+"""
+function get_strain_fitness!(fp::FluPop, df::DataFrame, field)
+	for s in values(fp.strains)
+		s.data[field] = missing
+	end
+	for d in eachrow(df)
+		if haskey(fp.strains, d.strain)
+			fp.strains[d.strain].data[field] = d.fitness
+		end
 	end
 end
