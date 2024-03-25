@@ -6,24 +6,16 @@ This repository contains the code used in the article
   
 
 ## Installing
-You need Julia version 1.4 or higher to run this code, and IJulia to run the notebooks.  
-First, clone this repository to your computer, navigate to it, start a julia session. Start the package manager mode by typing `]`. Then, successively enter (always in package manager mode)     
-`activate .`   
-followed by   
-`registry add https://github.com/BioJulia/BioJuliaRegistry.git`   
-`registry add https://github.com/JuliaRegistries/General.git`  
-and   
-`instantiate`  
-This will install all dependencies and make take a bit of time. 
+You need Julia version 1.10 or higher to run this code, and IJulia to run the notebooks.  
+First, clone this repository to your computer. Navigate to it and start a julia session by typing `julia --project=.`. 
+Alternatively, run `julia` and type `using Pkg; Pkg.activate(".")` to activate the project environment. 
+Finally, run `using Pkg; Pkg.instantiate()`. This will download all the dependencies given in the `Manifest.toml` file. 
 
-We will then set up IJulia with (still in package manager mode)
-`build IJulia`  
-Press backspace to exit the package manager mode. You should now be able to start jupyter notebooks with.    
-`using IJulia; IJulia.notebook()`  
-or by launching jupyter directly from your shell. 
+You should now be able to run the notebooks. Still in the julia session, run `using IJulia; IJulia.notebook()` (this will potentially prompt you to install jupyter through the Conda.jl package, explanations [here](https://github.com/JuliaLang/IJulia.jl)). Jupyter will start in a browser window, from which you can navigate to the FluPredictibility folder. Double-click any notebook to run it. 
     
 
 ## Content
+**Important**:
 - Folder `data` contains trees and lists of positions in HA and NA proteins necessary for the analysis. It does *not* contain the sequence alignments used in the paper. Accession numbers of strain used are available as a supplementary file with the publication.   
-- Folder `notebooks` contains jupyter notebooks that generate the figures of the paper. These notebook expect a folder `alignments` to exist, containing amino acid or nucleotide alignments to be used. 
+- Folder `notebooks` contains jupyter notebooks that generate the figures of the paper. These notebook expect a folder `alignments` to exist, containing amino acid or nucleotide alignments to be used. Alignments should be put there in the fasta format. 
 
